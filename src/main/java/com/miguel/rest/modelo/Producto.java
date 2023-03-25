@@ -1,7 +1,5 @@
 package com.miguel.rest.modelo;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "producto")
-public class Producto implements Serializable {
+public class Producto  {
 
 	@Id
 	@GeneratedValue

@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
+import com.miguel.rest.modelo.Categoria;
+import com.miguel.rest.modelo.CategoriaRepositorio;
 import com.miguel.rest.modelo.Producto;
 import com.miguel.rest.modelo.ProductoRepositorio;
 
@@ -28,6 +31,7 @@ public class ProductoController {
 	private final ProductoRepositorio productoRepositorio;
 	// añadimos el converter para que sepa como convertir los datos de la petición
 	private final ProductoDTOConverter productoDTOConverter;
+	private final CategoriaRepositorio categoriaRepositorio;
 
 	/**
 	 * Obtenemos todos los productos
@@ -66,9 +70,22 @@ public class ProductoController {
 	 * @return producto insertado
 	 */
 	@PostMapping("/producto")
-	public ResponseEntity<Producto> nuevoProducto(@Valid @RequestBody Producto nuevo) {
-		Producto result = productoRepositorio.save(nuevo);
-		return ResponseEntity.created(null).body(result);
+	public ResponseEntity<ProductoDTO> nuevoProducto(@Valid @RequestBody CreateProductoDTO nuevo) {
+		Categoria categoria = categoriaRepositorio.findById(nuevo.getCategoriaId())
+				.orElseThrow(() -> new RuntimeException(
+						"No se encontró la categoría con el id " + nuevo.getCategoriaId()));
+
+		Producto nuevoP = new Producto();
+		nuevoP.setNombre(nuevo.getNombre());
+		nuevoP.setDescripcion(nuevo.getDescripcion());
+		nuevoP.setPrecio(nuevo.getPrecio());
+		nuevoP.setCategoria(categoria);
+
+		Producto result = productoRepositorio.save(nuevoP);
+
+		ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
+
+		return ResponseEntity.created(null).body(resultDTO);
 	}
 
 	/**
