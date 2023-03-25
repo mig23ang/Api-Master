@@ -2,6 +2,8 @@ package com.miguel.rest.modelo;
 
 
 
+import java.io.Serializable;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor @AllArgsConstructor
 @Entity
 @Table(name = "categoria")
-public class Categoria {
+public class Categoria implements Serializable {
 
 	@Id @GeneratedValue
 	private Long id;
