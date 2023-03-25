@@ -2,6 +2,7 @@ package com.miguel.rest.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.miguel.rest.dto.ProductoDTO;
+import com.miguel.rest.dto.converter.ProductoDTOConverter;
 import com.miguel.rest.modelo.Producto;
 import com.miguel.rest.modelo.ProductoRepositorio;
 
@@ -23,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class ProductoController {
 
 	private final ProductoRepositorio productoRepositorio;
+	// añadimos el converter para que sepa como convertir los datos de la petición
+	private final ProductoDTOConverter productoDTOConverter;
 
 	/**
 	 * Obtenemos todos los productos
@@ -30,9 +35,15 @@ public class ProductoController {
 	 * @return
 	 */
 	@GetMapping("/producto/all")
-	public ResponseEntity<List<Producto>> obtenerTodos() {
+	public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
 		List<Producto> productos = productoRepositorio.findAll();
-		return productos.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(productos);
+		// con estas lineas mostramos el objeto completo anidado
+		// return productos.isEmpty() ? ResponseEntity.notFound().build() :
+		// ResponseEntity.ok(productos);
+		List<ProductoDTO> dtoList = productos.stream()
+				.map(productoDTOConverter::convertToDto)
+				.collect(Collectors.toList());
+		return dtoList.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(dtoList);
 	}
 
 	/**
