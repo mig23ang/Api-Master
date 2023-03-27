@@ -15,7 +15,7 @@ public class ProductEmptyException extends RuntimeException {
     }
 
     // creando drive de errores para el método obtenerTodos
-    @ExceptionHandler({ ProductoNotFoundException.class, ProductEmptyException.class })
+    @ExceptionHandler({ ProductEmptyException.class, ProductEmptyException.class })
     public ResponseEntity<String> handleNotFoundException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }

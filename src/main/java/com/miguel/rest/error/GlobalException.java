@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalException {
 
     // productos
-    @ExceptionHandler(value = { ProductoNotFoundException.class, CategoriaNotFoundException.class })
+    @ExceptionHandler(value = { ProductoNotFoundException.class, ProductoNotFoundException.class })
     public ResponseEntity<String> handleNotFoundException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
@@ -21,7 +21,7 @@ public class GlobalException {
 
     // categorias
     @ExceptionHandler(CategoriaNotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(CategoriaNotFoundException ex) {
+    public ResponseEntity<String> handleCategoriaException(CategoriaNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ex.getMessage());
     }
 }
