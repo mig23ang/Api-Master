@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
@@ -80,17 +80,21 @@ public class ProductoController {
 				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND,
 						"No se encontró la categoría con id " + nuevo.getCategoriaId()));
 
-		Producto nuevoP = new Producto();
-		nuevoP.setNombre(nuevo.getNombre());
-		nuevoP.setDescripcion(nuevo.getDescripcion());
-		nuevoP.setPrecio(nuevo.getPrecio());
-		nuevoP.setCategoria(categoria);
+		try {
+			Producto nuevoP = new Producto();
+			nuevoP.setNombre(nuevo.getNombre());
+			nuevoP.setDescripcion(nuevo.getDescripcion());
+			nuevoP.setPrecio(nuevo.getPrecio());
+			nuevoP.setCategoria(categoria);
 
-		Producto result = productoRepositorio.save(nuevoP);
+			Producto result = productoRepositorio.save(nuevoP);
 
-		ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
+			ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
 
-		return ResponseEntity.created(null).body(resultDTO);
+			return ResponseEntity.created(null).body(resultDTO);
+		} catch (Exception e) {
+			throw new Error(e);
+		}
 	}
 
 	/**
@@ -131,7 +135,8 @@ public class ProductoController {
 					productoRepositorio.delete(c);
 					return ResponseEntity.noContent().<Void>build();
 				})
-				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
+				.orElseThrow(
+						() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
 	}
 
 }
