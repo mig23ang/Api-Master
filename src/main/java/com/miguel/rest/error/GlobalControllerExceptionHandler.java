@@ -2,14 +2,17 @@ package com.miguel.rest.error;
 
 import java.time.LocalDateTime;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@ControllerAdvice
-public class GlobalControllerExceptionHandler {
+@RestControllerAdvice
+public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(GlobalException ex) {
@@ -17,12 +20,12 @@ public class GlobalControllerExceptionHandler {
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
-            MethodArgumentTypeMismatchException ex) {
-        String message = "El parámetro '" + ex.getName() + "' debe ser de tipo " + ex.getRequiredType().getSimpleName();
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message, LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+    // @Override
+    // protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+    //         HttpStatus status, WebRequest request) {
+    //     HttpHeaders httpHeaders = new HttpHeaders();
+    //     ErrorResponse apiError = new ErrorResponse(status, ex.getMessage());
+    //     return ResponseEntity.status(status).headers(httpHeaders).body(apiError);
+    // }
 
 }
