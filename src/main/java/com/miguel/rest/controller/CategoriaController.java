@@ -3,6 +3,7 @@ package com.miguel.rest.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.miguel.rest.error.CategoriaNotFoundException;
+import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.CategoriaRepositorio;
 
@@ -36,7 +37,7 @@ public class CategoriaController {
     public ResponseEntity<Categoria> categoryById(@PathVariable Long id) {
         return categoriaRepositorio.findById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new CategoriaNotFoundException(id));
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró la categoría"));
     }
 
     // obtener una categoría en base a su nombre
@@ -61,7 +62,7 @@ public class CategoriaController {
                     c.setNombre(categoria.getNombre());
                     return ResponseEntity.ok(categoriaRepositorio.save(c));
                 })
-                .orElseThrow(() -> new CategoriaNotFoundException(id));
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró la categoría"));
     }
 
     // eliminar una categoría
@@ -72,7 +73,7 @@ public class CategoriaController {
                     categoriaRepositorio.delete(c);
                     return ResponseEntity.ok().<Void>build();
                 })
-                .orElseThrow(() -> new CategoriaNotFoundException(id));
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró la categoría"));
     }
 
 }

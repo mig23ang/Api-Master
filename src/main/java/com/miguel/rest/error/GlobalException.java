@@ -1,27 +1,20 @@
 package com.miguel.rest.error;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice
-public class GlobalException {
+public class GlobalException extends RuntimeException {
+    private HttpStatus status;
 
-    // productos
-    @ExceptionHandler(value = { ProductoNotFoundException.class, ProductoNotFoundException.class })
-    public ResponseEntity<String> handleNotFoundException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public GlobalException(HttpStatus status, String message) {
+        super(message);
+        this.status = status;
     }
 
-    @ExceptionHandler(ProductEmptyException.class)
-    public ResponseEntity<String> handleProductEmptyException(ProductEmptyException ex) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ex.getMessage());
+    public HttpStatus getStatus() {
+        return status;
     }
 
-    // categorias
-    @ExceptionHandler(CategoriaNotFoundException.class)
-    public ResponseEntity<String> handleCategoriaException(CategoriaNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ex.getMessage());
+    public void setStatus(HttpStatus status) {
+        this.status = status;
     }
 }

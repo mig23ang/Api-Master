@@ -19,9 +19,7 @@ import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
 import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
-import com.miguel.rest.error.CategoriaNotFoundException;
-import com.miguel.rest.error.ProductEmptyException;
-import com.miguel.rest.error.ProductoNotFoundException;
+import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.CategoriaRepositorio;
 import com.miguel.rest.modelo.Producto;
@@ -51,7 +49,7 @@ public class ProductoController {
 				.map(productoDTOConverter::convertToDto)
 				.collect(Collectors.toList());
 		if (dtoList.isEmpty()) {
-			throw new ProductEmptyException();
+			throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron productos");
 		}
 		return ResponseEntity.ok(dtoList);
 	}
@@ -66,7 +64,8 @@ public class ProductoController {
 	public ResponseEntity<Producto> obtenerUno(@PathVariable Long id) {
 		return productoRepositorio.findById(id)
 				.map(ResponseEntity::ok)
-				.orElseThrow(() -> new ProductoNotFoundException(id));
+				.orElseThrow(
+						() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
 	}
 
 	/**
@@ -78,7 +77,8 @@ public class ProductoController {
 	@PostMapping("/producto")
 	public ResponseEntity<ProductoDTO> nuevoProducto(@Valid @RequestBody CreateProductoDTO nuevo) {
 		Categoria categoria = categoriaRepositorio.findById(nuevo.getCategoriaId())
-				.orElseThrow(() -> new CategoriaNotFoundException(nuevo.getCategoriaId()));
+				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND,
+						"No se encontró la categoría con id " + nuevo.getCategoriaId()));
 
 		Producto nuevoP = new Producto();
 		nuevoP.setNombre(nuevo.getNombre());
@@ -104,7 +104,8 @@ public class ProductoController {
 			@PathVariable Long id) {
 		Optional<Producto> optionalProducto = productoRepositorio.findById(id);
 		Categoria categoria = categoriaRepositorio.findById(editar.getCategoriaId())
-				.orElseThrow(() -> new CategoriaNotFoundException(editar.getCategoriaId()));
+				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND,
+						"No se encontró la categoría con id " + editar.getCategoriaId()));
 
 		return optionalProducto.map(producto -> {
 			producto.setNombre(editar.getNombre());
@@ -114,7 +115,7 @@ public class ProductoController {
 			Producto result = productoRepositorio.save(producto);
 			ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
 			return ResponseEntity.ok(resultDTO);
-		}).orElseThrow(() -> new ProductoNotFoundException(id));
+		}).orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
 	}
 
 	/**
@@ -130,9 +131,7 @@ public class ProductoController {
 					productoRepositorio.delete(c);
 					return ResponseEntity.noContent().<Void>build();
 				})
-				.orElseThrow(() -> new ProductoNotFoundException(id));
+				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
 	}
-
-	
 
 }
