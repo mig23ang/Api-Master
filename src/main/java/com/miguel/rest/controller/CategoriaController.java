@@ -1,7 +1,6 @@
 package com.miguel.rest.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

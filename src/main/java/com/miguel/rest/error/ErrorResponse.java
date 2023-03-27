@@ -14,8 +14,8 @@ import lombok.NonNull;
 @NoArgsConstructor
 public class ErrorResponse {
 
-    @NonNull
     private int status;
+    
     private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     @NonNull
