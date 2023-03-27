@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
@@ -24,10 +27,10 @@ import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.CategoriaRepositorio;
 import com.miguel.rest.modelo.Producto;
 import com.miguel.rest.modelo.ProductoRepositorio;
+import com.miguel.rest.upload.StorageService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +40,9 @@ public class ProductoController {
 	// añadimos el converter para que sepa como convertir los datos de la petición
 	private final ProductoDTOConverter productoDTOConverter;
 	private final CategoriaRepositorio categoriaRepositorio;
+
+	// Inyectamos StorageService
+	private final StorageService storageService;
 
 	/**
 	 * Obtenemos todos los productos
@@ -75,8 +81,17 @@ public class ProductoController {
 	 * @param nuevo
 	 * @return producto insertado
 	 */
-	@PostMapping("/producto")
-	public ResponseEntity<ProductoDTO> nuevoProducto(@Valid @RequestBody CreateProductoDTO nuevo) {
+	@PostMapping(value = "/producto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ProductoDTO> nuevoProducto(@Valid @RequestPart("nuevo") CreateProductoDTO nuevo,
+			@RequestPart("file") MultipartFile file) {
+		String urlImage = null;
+		if (file != null) {
+			String image = storageService.store(file);
+			urlImage = MvcUriComponentsBuilder
+					.fromMethodName(FicherosController.class, "serveFile", image, null)
+					.build()
+					.toString();
+		}
 		Categoria categoria = categoriaRepositorio.findById(nuevo.getCategoriaId())
 				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND,
 						"No se encontró la categoría con id " + nuevo.getCategoriaId()));
@@ -85,6 +100,7 @@ public class ProductoController {
 			Producto nuevoP = new Producto();
 			nuevoP.setNombre(nuevo.getNombre());
 			nuevoP.setDescripcion(nuevo.getDescripcion());
+			nuevoP.setImagen(urlImage);
 			nuevoP.setPrecio(nuevo.getPrecio());
 			nuevoP.setCategoria(categoria);
 
