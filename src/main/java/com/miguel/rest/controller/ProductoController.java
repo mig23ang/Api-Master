@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import com.miguel.rest.dto.EditarProductoDTO;
 import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
 import com.miguel.rest.error.CategoriaNotFoundException;
+import com.miguel.rest.error.ProductEmptyException;
 import com.miguel.rest.error.ProductoNotFoundException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.CategoriaRepositorio;
@@ -45,13 +47,13 @@ public class ProductoController {
 	@GetMapping("/producto/all")
 	public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
 		List<Producto> productos = productoRepositorio.findAll();
-		// con estas lineas mostramos el objeto completo anidado
-		// return productos.isEmpty() ? ResponseEntity.notFound().build() :
-		// ResponseEntity.ok(productos);
 		List<ProductoDTO> dtoList = productos.stream()
 				.map(productoDTOConverter::convertToDto)
 				.collect(Collectors.toList());
-		return dtoList.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(dtoList);
+		if (dtoList.isEmpty()) {
+			throw new ProductEmptyException();
+		}
+		return ResponseEntity.ok(dtoList);
 	}
 
 	/**
