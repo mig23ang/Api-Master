@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.miguel.rest.error.GlobalException;
@@ -20,19 +21,20 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/categoria")
 public class CategoriaController {
 
     private final CategoriaRepositorio categoriaRepositorio;
 
     // obtener todas las categorías
-    @GetMapping("/categoria/all")
+    @GetMapping("/all")
     public ResponseEntity<List<Categoria>> allCategories() {
         List<Categoria> categorias = categoriaRepositorio.findAll();
         return categorias.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(categorias);
     }
 
     // obtener una categoría en base a su ID
-    @GetMapping("/categoria/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Categoria> categoryById(@PathVariable Long id) {
         return categoriaRepositorio.findById(id)
                 .map(ResponseEntity::ok)
@@ -40,7 +42,7 @@ public class CategoriaController {
     }
 
     // obtener una categoría en base a su nombre
-    @GetMapping("/categoria/nombre/{nombre}")
+    @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Categoria> categoryByName(@PathVariable String nombre) {
         return categoriaRepositorio.findByNombre(nombre)
                 .map(ResponseEntity::ok)
@@ -48,13 +50,13 @@ public class CategoriaController {
     }
 
     // crear una categoría
-    @PostMapping("/categoria")
+    @PostMapping("/")
     public ResponseEntity<Categoria> createCategory(@RequestBody Categoria categoria) {
         return ResponseEntity.ok(categoriaRepositorio.save(categoria));
     }
 
     // editar una categoría
-    @PutMapping("/categoria/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Categoria> editCategory(@PathVariable Long id, @RequestBody Categoria categoria) {
         return categoriaRepositorio.findById(id)
                 .map(c -> {
@@ -65,7 +67,7 @@ public class CategoriaController {
     }
 
     // eliminar una categoría
-    @DeleteMapping("/categoria/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         return categoriaRepositorio.findById(id)
                 .map(c -> {

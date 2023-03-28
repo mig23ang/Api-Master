@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/producto")
 public class ProductoController {
 
 	private final ProductoRepositorio productoRepositorio;
@@ -51,7 +52,7 @@ public class ProductoController {
 	 * @return
 	 */
 
-	@GetMapping("/producto/all")
+	@GetMapping("/all")
 	public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
 		List<Producto> productos = productoRepositorio.findAll();
 		List<ProductoDTO> dtoList = productos.stream()
@@ -69,7 +70,7 @@ public class ProductoController {
 	 * @param id
 	 * @return Null si no encuentra el producto
 	 */
-	@GetMapping("/producto/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Producto> obtenerUno(@PathVariable Long id) {
 		return productoRepositorio.findById(id)
 				.map(ResponseEntity::ok)
@@ -83,7 +84,7 @@ public class ProductoController {
 	 * @param nuevo
 	 * @return producto insertado
 	 */
-	@PostMapping(value = "/producto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ProductoDTO> nuevoProducto(@Valid @RequestPart("nuevo") CreateProductoDTO nuevo,
 			@RequestPart("file") MultipartFile file) {
 		String urlImage = null;
@@ -122,7 +123,7 @@ public class ProductoController {
 	 * @param id
 	 * @return
 	 */
-	@PutMapping("/producto/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<ProductoDTO> editarProducto(@Valid @RequestBody EditarProductoDTO editar,
 			@PathVariable Long id) {
 		Optional<Producto> optionalProducto = productoRepositorio.findById(id);
@@ -147,7 +148,7 @@ public class ProductoController {
 	 * @param id
 	 * @return
 	 */
-	@DeleteMapping("/producto/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> borrarProducto(@PathVariable Long id) {
 		return productoRepositorio.findById(id)
 				.map(c -> {
