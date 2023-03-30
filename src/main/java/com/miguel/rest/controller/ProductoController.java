@@ -25,9 +25,9 @@ import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
 import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
-import com.miguel.rest.modelo.CategoriaRepositorio;
 import com.miguel.rest.modelo.Producto;
-import com.miguel.rest.modelo.ProductoRepositorio;
+import com.miguel.rest.repos.CategoriaRepositorio;
+import com.miguel.rest.repos.ProductoRepositorio;
 import com.miguel.rest.upload.StorageService;
 
 import jakarta.validation.Valid;
