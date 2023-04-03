@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.repos.CategoriaRepositorio;
+import com.miguel.rest.services.CategoriaServicio;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,22 +27,26 @@ public class CategoriaController {
 
     private final CategoriaRepositorio categoriaRepositorio;
 
+    //inyectamos el servicio de categoria
+     private final CategoriaServicio categoriaServicio;
+
     // obtener todas las categorías
     @GetMapping("/all")
     public ResponseEntity<List<Categoria>> allCategories() {
-        List<Categoria> categorias = categoriaRepositorio.findAll();
+        List<Categoria> categorias = categoriaServicio.findAll();
         return categorias.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(categorias);
     }
 
     // obtener una categoría en base a su ID
     @GetMapping("/{id}")
     public ResponseEntity<Categoria> categoryById(@PathVariable Long id) {
-        return categoriaRepositorio.findById(id)
+        return categoriaServicio.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró la categoría"));
     }
 
     // obtener una categoría en base a su nombre
+    //este método se debe agregar al service
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Categoria> categoryByName(@PathVariable String nombre) {
         return categoriaRepositorio.findByNombre(nombre)
@@ -52,16 +57,16 @@ public class CategoriaController {
     // crear una categoría
     @PostMapping("/")
     public ResponseEntity<Categoria> createCategory(@RequestBody Categoria categoria) {
-        return ResponseEntity.ok(categoriaRepositorio.save(categoria));
+        return ResponseEntity.ok(categoriaServicio.save(categoria));
     }
 
     // editar una categoría
     @PutMapping("/{id}")
     public ResponseEntity<Categoria> editCategory(@PathVariable Long id, @RequestBody Categoria categoria) {
-        return categoriaRepositorio.findById(id)
+        return categoriaServicio.findById(id)
                 .map(c -> {
                     c.setNombre(categoria.getNombre());
-                    return ResponseEntity.ok(categoriaRepositorio.save(c));
+                    return ResponseEntity.ok(categoriaServicio.save(c));
                 })
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró la categoría"));
     }
@@ -69,7 +74,7 @@ public class CategoriaController {
     // eliminar una categoría
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        return categoriaRepositorio.findById(id)
+        return categoriaServicio.findById(id)
                 .map(c -> {
                     categoriaRepositorio.delete(c);
                     return ResponseEntity.ok().<Void>build();

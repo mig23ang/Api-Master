@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.Producto;
 import com.miguel.rest.repos.CategoriaRepositorio;
 import com.miguel.rest.repos.ProductoRepositorio;
+import com.miguel.rest.services.ProductoServicio;
 import com.miguel.rest.upload.StorageService;
 
 import jakarta.validation.Valid;
@@ -46,6 +48,20 @@ public class ProductoController {
 	// Inyectamos StorageService
 	private final StorageService storageService;
 
+	// inyectamos el servicio de producto
+	private final ProductoServicio productoServicio;
+
+	// esto es una buena practica pero no es obligatorio
+	// public ProductoController(ProductoServicio productoServicio,
+	// ProductoDTOConverter productoDTOConverter, StorageService storageService,
+	// CategoriaRepositorio categoriaRepositorio, ProductoRepositorio
+	// productoRepositorio) {
+	// this.productoServicio = productoServicio;
+	// this.productoDTOConverter = productoDTOConverter;
+	// this.storageService = storageService;
+	// this.categoriaRepositorio = categoriaRepositorio;
+	// this.productoRepositorio = productoRepositorio;
+	// }
 	/**
 	 * Obtenemos todos los productos
 	 * 
@@ -54,7 +70,7 @@ public class ProductoController {
 
 	@GetMapping("/all")
 	public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
-		List<Producto> productos = productoRepositorio.findAll();
+		List<Producto> productos = productoServicio.findAll();
 		List<ProductoDTO> dtoList = productos.stream()
 				.map(productoDTOConverter::convertToDto)
 				.collect(Collectors.toList());
@@ -72,7 +88,7 @@ public class ProductoController {
 	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<Producto> obtenerUno(@PathVariable Long id) {
-		return productoRepositorio.findById(id)
+		return productoServicio.findById(id)
 				.map(ResponseEntity::ok)
 				.orElseThrow(
 						() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
@@ -107,7 +123,7 @@ public class ProductoController {
 			nuevoP.setPrecio(nuevo.getPrecio());
 			nuevoP.setCategoria(categoria);
 
-			Producto result = productoRepositorio.save(nuevoP);
+			Producto result = productoServicio.save(nuevoP);
 
 			ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
 
@@ -126,7 +142,7 @@ public class ProductoController {
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductoDTO> editarProducto(@Valid @RequestBody EditarProductoDTO editar,
 			@PathVariable Long id) {
-		Optional<Producto> optionalProducto = productoRepositorio.findById(id);
+		Optional<Producto> optionalProducto = productoServicio.findById(id);
 		Categoria categoria = categoriaRepositorio.findById(editar.getCategoriaId())
 				.orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND,
 						"No se encontró la categoría con id " + editar.getCategoriaId()));
@@ -136,7 +152,7 @@ public class ProductoController {
 			producto.setDescripcion(editar.getDescripcion());
 			producto.setPrecio(editar.getPrecio());
 			producto.setCategoria(categoria);
-			Producto result = productoRepositorio.save(producto);
+			Producto result = productoServicio.save(producto);
 			ProductoDTO resultDTO = productoDTOConverter.convertToDto(result);
 			return ResponseEntity.ok(resultDTO);
 		}).orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "No se encontró el producto con id " + id));
@@ -150,9 +166,9 @@ public class ProductoController {
 	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> borrarProducto(@PathVariable Long id) {
-		return productoRepositorio.findById(id)
+		return productoServicio.findById(id)
 				.map(c -> {
-					productoRepositorio.delete(c);
+					productoServicio.delete(c);
 					return ResponseEntity.noContent().<Void>build();
 				})
 				.orElseThrow(
