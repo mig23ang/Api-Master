@@ -1,12 +1,15 @@
 package com.miguel.rest.controller;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
@@ -30,7 +34,9 @@ import com.miguel.rest.repos.CategoriaRepositorio;
 import com.miguel.rest.repos.ProductoRepositorio;
 import com.miguel.rest.services.ProductoServicio;
 import com.miguel.rest.upload.StorageService;
+import com.miguel.rest.utils.pagination.PaginationLinksUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -50,33 +56,28 @@ public class ProductoController {
 	// inyectamos el servicio de producto
 	private final ProductoServicio productoServicio;
 
-	// esto es una buena practica pero no es obligatorio
-	// public ProductoController(ProductoServicio productoServicio,
-	// ProductoDTOConverter productoDTOConverter, StorageService storageService,
-	// CategoriaRepositorio categoriaRepositorio, ProductoRepositorio
-	// productoRepositorio) {
-	// this.productoServicio = productoServicio;
-	// this.productoDTOConverter = productoDTOConverter;
-	// this.storageService = storageService;
-	// this.categoriaRepositorio = categoriaRepositorio;
-	// this.productoRepositorio = productoRepositorio;
-	// }
+	// Inyectamos la Pagination
+	private final PaginationLinksUtils paginationLinksUtils;
+
 	/**
 	 * Obtenemos todos los productos
 	 * 
 	 * @return
 	 */
 
-	@GetMapping("/all")
-	public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
-		List<Producto> productos = productoServicio.findAll();
-		List<ProductoDTO> dtoList = productos.stream()
-				.map(productoDTOConverter::convertToDto)
-				.collect(Collectors.toList());
-		if (dtoList.isEmpty()) {
+	@GetMapping("/all/")
+	public ResponseEntity<Page<ProductoDTO>> obtenerTodos(@PageableDefault(size = 10, page = 0) Pageable pageable,
+			HttpServletRequest request) {
+		Page<ProductoDTO> dtoPage = productoServicio.findAll(pageable).map(productoDTOConverter::convertToDto);
+
+		if (dtoPage.isEmpty()) {
 			throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron productos");
 		}
-		return ResponseEntity.ok(dtoList);
+
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request));
+		return ResponseEntity.ok()
+				.header(HttpHeaders.LINK, paginationLinksUtils.createLinkHeader(dtoPage, uriBuilder))
+				.body(dtoPage);
 	}
 
 	/**
