@@ -1,23 +1,21 @@
 package com.miguel.rest.utils.pagination;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 public class PaginationUtils {
 
     // creamos el método crearPaginationDTO
-    public static <T> Pagination<T> crearPaginationDTO(Page<?> page, List<T> dtoList) {
+    public static <T> Pagination<T> crearPaginationDTO(Page<?> page, Page<T> dtoPage) {
         Pagination<T> pagination = new Pagination<>();
-        pagination.setTotalPaginas(page.getTotalPages());
-        pagination.setNumPaginaActual(page.getNumber());
-        pagination.setTamPagina(page.getSize());
-        pagination.setTotalElementos(page.getTotalElements());
-        pagination.setElementos(dtoList);
+        pagination.setTotalPaginas(dtoPage.getTotalPages());
+        pagination.setNumPaginaActual(dtoPage.getNumber());
+        pagination.setTamPagina(dtoPage.getSize());
+        pagination.setTotalElementos(dtoPage.getTotalElements());
+        pagination.setElementos(dtoPage.getContent());
         return pagination;
     }
 
-    //método global para pagination sin dto
+    // método global para pagination sin dto
     public static <T> Pagination<T> crearPagination(Page<?> page) {
         Pagination<T> pagination = new Pagination<>();
         pagination.setTotalPaginas(page.getTotalPages());

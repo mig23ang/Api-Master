@@ -1,5 +1,7 @@
 package com.miguel.rest.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -29,13 +31,12 @@ public class ProductoServicio extends BaseService<Producto, Long, ProductoReposi
 					.fromMethodName(FicherosController.class, "serveFile", imagen, null)
 					.build().toUriString();
 		}
-
-		// En ocasiones, no necesitamos el uso de ModelMapper si la conversión que vamos
-		// a hacer
-		// es muy sencilla. Con el uso de @Builder sobre la clase en cuestión, podemos
-		// realizar
-		// una transformación rápida como esta.
-
+		/**
+		 * En ocasiones, no necesitamos el uso de ModelMapper si la conversión que vamos
+		 * a hacer es muy sencilla. Con el uso de @Builder sobre la clase en cuestión,
+		 * podemos realizar una
+		 * transformación rápida como esta.
+		 */
 		Producto nuevoProducto = Producto.builder()
 				.nombre(nuevo.getNombre())
 				.precio(nuevo.getPrecio())
@@ -44,7 +45,11 @@ public class ProductoServicio extends BaseService<Producto, Long, ProductoReposi
 				.build();
 
 		return this.save(nuevoProducto);
+	}
 
+	// método para buscar por nombre
+	public Page<Producto> findByNombre(String txt, Pageable pageable) {
+		return this.repositorio.findByNombreContainsIgnoreCase(txt, pageable);
 	}
 
 }

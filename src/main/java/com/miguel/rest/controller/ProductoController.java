@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,15 +71,37 @@ public class ProductoController {
 	public ResponseEntity<Pagination<ProductoDTO>> obtenerTodos(@PageableDefault(size = 10, page = 0) Pageable pageable,
 			HttpServletRequest request) {
 		Page<Producto> productos = productoServicio.findAll(pageable);
-		List<ProductoDTO> dtoList = productos.getContent().stream()
-				.map(productoDTOConverter::convertToDto)
-				.collect(Collectors.toList());
 
-		if (dtoList.isEmpty()) {
+		if (productos.isEmpty()) {
 			throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron productos");
 		}
-		// traemos el método crearPaginationDTO que es un método global que nos va a servir para cualquier pagination con dto
-		Pagination<ProductoDTO> pagination = PaginationUtils.crearPaginationDTO(productos, dtoList);
+		// traemos el método crearPaginationDTO que es un método global que nos va a
+		// servir para cualquier pagination con dto
+		Page<ProductoDTO> dtoPage = productos
+				.map(productoDTOConverter::convertToDto);
+		Pagination<ProductoDTO> pagination = PaginationUtils.crearPaginationDTO(productos, dtoPage);
+
+		return ResponseEntity.ok().body(pagination);
+	}
+
+	/**
+	 * obtener producto por texto
+	 * 
+	 * @param txt
+	 * @return Productos filtrados por texto
+	 */
+
+	@GetMapping("/")
+	public ResponseEntity<?> obtenerPorNombre(@RequestParam("nombre") String nombre, Pageable pageable,
+			HttpServletRequest request) {
+		Page<Producto> productos = productoServicio.findByNombre(nombre, pageable);
+
+		if (productos.isEmpty()) {
+			throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron productos con ese nombre");
+		}
+
+		Page<ProductoDTO> dtoPage = productos.map(productoDTOConverter::convertToDto);
+		Pagination<ProductoDTO> pagination = PaginationUtils.crearPaginationDTO(productos, dtoPage);
 
 		return ResponseEntity.ok().body(pagination);
 	}
