@@ -2,6 +2,9 @@ package com.miguel.rest.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +20,8 @@ import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.repos.CategoriaRepositorio;
 import com.miguel.rest.services.CategoriaServicio;
+import com.miguel.rest.utils.pagination.Pagination;
+import com.miguel.rest.utils.pagination.PaginationUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,14 +32,25 @@ public class CategoriaController {
 
     private final CategoriaRepositorio categoriaRepositorio;
 
-    //inyectamos el servicio de categoria
-     private final CategoriaServicio categoriaServicio;
+    // inyectamos el servicio de categoria
+    private final CategoriaServicio categoriaServicio;
 
     // obtener todas las categorías
-    @GetMapping("/all")
-    public ResponseEntity<List<Categoria>> allCategories() {
-        List<Categoria> categorias = categoriaServicio.findAll();
-        return categorias.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(categorias);
+    @GetMapping("/all/")
+    public ResponseEntity<Pagination<Categoria>> allCategories(
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        Page<Categoria> categoriasPage = categoriaServicio.findAll(pageable);
+        List<Categoria> categorias = categoriasPage.getContent();
+
+        if (categorias.isEmpty()) {
+            throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron categorias");
+        }
+
+        Pagination<Categoria> pagination = PaginationUtils.crearPagination(categoriasPage);
+
+        pagination.setElementos(categorias);
+
+        return ResponseEntity.ok().body(pagination);
     }
 
     // obtener una categoría en base a su ID
@@ -46,7 +62,7 @@ public class CategoriaController {
     }
 
     // obtener una categoría en base a su nombre
-    //este método se debe agregar al service
+    // este método se debe agregar al service
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Categoria> categoryByName(@PathVariable String nombre) {
         return categoriaRepositorio.findByNombre(nombre)
