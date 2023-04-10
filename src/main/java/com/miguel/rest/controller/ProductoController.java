@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
 import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
+import com.miguel.rest.dto.views.ProductoViews;
 import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.Producto;
@@ -67,6 +69,9 @@ public class ProductoController {
 	 * @return
 	 */
 
+	// esta anotación en Jakarta ya no es necesaria ya que lista el precio en el
+	// dto. pero si usa java 8 o 11, es necesario
+	@JsonView(ProductoViews.DtoConPrecio.class)
 	@GetMapping("/all/")
 	public ResponseEntity<Pagination<ProductoDTO>> obtenerTodos(@PageableDefault(size = 10, page = 0) Pageable pageable,
 			HttpServletRequest request) {
