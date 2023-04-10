@@ -71,7 +71,7 @@ public class ProductoController {
 
 	// esta anotación en Jakarta ya no es necesaria ya que lista el precio en el
 	// dto. pero si usa java 8 o 11, es necesario
-	@JsonView(ProductoViews.DtoConPrecio.class)
+	//@JsonView(ProductoViews.DtoConPrecio.class)
 	@GetMapping("/all/")
 	public ResponseEntity<Pagination<ProductoDTO>> obtenerTodos(@PageableDefault(size = 10, page = 0) Pageable pageable,
 			HttpServletRequest request) {
