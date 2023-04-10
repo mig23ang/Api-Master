@@ -9,7 +9,7 @@ import com.miguel.rest.modelo.Producto;
 @Component
 public class ProductoDTOConverter {
 
-    //método moderno con inyección de dependencias
+    // método moderno con inyección de dependencias
     private final ModelMapper modelMapper;
 
     public ProductoDTOConverter(ModelMapper modelMapper) {
@@ -19,5 +19,15 @@ public class ProductoDTOConverter {
     public ProductoDTO convertToDto(Producto producto) {
         return modelMapper.map(producto, ProductoDTO.class);
     }
-}
 
+    // método tradicional sin inyección de dependencias
+    public ProductoDTO converterProductoToProductoDTO(Producto producto) {
+        return ProductoDTO.builder()
+                .nombre(producto.getNombre())
+                .descripcion(producto.getDescripcion())
+                .imagen(producto.getImagen())
+                .precio(producto.getPrecio())
+                .categoriaNombre(producto.getCategoria().getNombre())
+                .build();
+    }
+}

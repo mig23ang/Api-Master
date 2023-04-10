@@ -78,7 +78,7 @@ public class ProductoController {
 		// traemos el método crearPaginationDTO que es un método global que nos va a
 		// servir para cualquier pagination con dto
 		Page<ProductoDTO> dtoPage = productos
-				.map(productoDTOConverter::convertToDto);
+				.map(productoDTOConverter::converterProductoToProductoDTO);
 		Pagination<ProductoDTO> pagination = PaginationUtils.crearPaginationDTO(productos, dtoPage);
 
 		return ResponseEntity.ok().body(pagination);
