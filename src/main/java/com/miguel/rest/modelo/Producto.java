@@ -26,7 +26,7 @@ public class Producto {
 	private String nombre;
 
 	private String descripcion;
-	private float precio;
+	private Float precio;
 	private String imagen;
 	
 	@ManyToOne

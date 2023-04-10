@@ -85,6 +85,30 @@ public class ProductoController {
 	}
 
 	/**
+	 * Obtenemos todos los productos por Args
+	 * 
+	 * @param txt @param precio
+	 * @return los productos que tengan ese texto y un precio menor o igual al
+	 *         entregado en el parámetro
+	 */
+	@GetMapping("/args/")
+	public ResponseEntity<?> buscarPorSpecs(
+			@RequestParam("nombre") Optional<String> txt,
+			@RequestParam("precio") Optional<Float> precio,
+			Pageable pageable, HttpServletRequest request) {
+		Page<Producto> productos = productoServicio.findByArgs(txt, precio, pageable);
+
+		if (productos.isEmpty()) {
+			throw new GlobalException(HttpStatus.NOT_FOUND, "No se encontraron productos con ese nombre y precio");
+		}
+
+		Page<ProductoDTO> dtoPage = productos.map(productoDTOConverter::convertToDto);
+		Pagination<ProductoDTO> pagination = PaginationUtils.crearPaginationDTO(productos, dtoPage);
+
+		return ResponseEntity.ok().body(pagination);
+	}
+
+	/**
 	 * obtener producto por texto
 	 * 
 	 * @param txt
