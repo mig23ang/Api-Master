@@ -32,7 +32,7 @@ public class Lote {
     private String nombre;
 
     @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "lote_id"), inverseJoinColumns = @JoinColumn(name = "producto_id"))
+    @JoinTable(name = "lote_producto", joinColumns = @JoinColumn(name = "lote_id"), inverseJoinColumns = @JoinColumn(name = "producto_id"))
     @Builder.Default
     private Set<Producto> productos = new HashSet<>();
 
