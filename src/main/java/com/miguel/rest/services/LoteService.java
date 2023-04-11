@@ -16,10 +16,10 @@ public class LoteService extends BaseService<Lote, Long, LoteRepositorio> {
 
     private final ProductoServicio productoServicio;
 
-    @Override
-    public Optional<Lote> findById(Long id) {
-        return repositorio.findByIdJoinFetch(id);
-    }
+    // @Override
+    // public Optional<Lote> findById(Long id) {
+    //     return repositorio.findByIdJoinFetch(id);
+    // }
 
     public Lote nuevoLote(CreateLoteDTO nuevoLote) {
         Lote l = Lote.builder()
