@@ -1,8 +1,7 @@
 package com.miguel.rest.controller;
 
-import java.util.List;
+
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,21 +22,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.miguel.rest.dto.CreateProductoDTO;
 import com.miguel.rest.dto.EditarProductoDTO;
 import com.miguel.rest.dto.ProductoDTO;
 import com.miguel.rest.dto.converter.ProductoDTOConverter;
-import com.miguel.rest.dto.views.ProductoViews;
 import com.miguel.rest.error.GlobalException;
 import com.miguel.rest.modelo.Categoria;
 import com.miguel.rest.modelo.Producto;
 import com.miguel.rest.repos.CategoriaRepositorio;
-import com.miguel.rest.repos.ProductoRepositorio;
 import com.miguel.rest.services.ProductoServicio;
 import com.miguel.rest.upload.StorageService;
 import com.miguel.rest.utils.pagination.Pagination;
-import com.miguel.rest.utils.pagination.PaginationLinksUtils;
 import com.miguel.rest.utils.pagination.PaginationUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/producto")
 public class ProductoController {
 
-	private final ProductoRepositorio productoRepositorio;
+	//private final ProductoRepositorio productoRepositorio;
 	// añadimos el converter para que sepa como convertir los datos de la petición
 	private final ProductoDTOConverter productoDTOConverter;
 	private final CategoriaRepositorio categoriaRepositorio;
@@ -61,7 +56,7 @@ public class ProductoController {
 	private final ProductoServicio productoServicio;
 
 	// Inyectamos la Pagination
-	private final PaginationLinksUtils paginationLinksUtils;
+	//private final PaginationLinksUtils paginationLinksUtils;
 
 	/**
 	 * Obtenemos todos los productos

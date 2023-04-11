@@ -27,7 +27,7 @@ public class PedidoController {
     private final PedidoService pedidoServicio;
 
     @GetMapping("/")
-    public ResponseEntity<Pagination<Pedido>> allCategories(
+    public ResponseEntity<Pagination<Pedido>> allPedidos(
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
         Page<Pedido> pedidosPage = pedidoServicio.findAll(pageable);
         List<Pedido> Pedidos = pedidosPage.getContent();
