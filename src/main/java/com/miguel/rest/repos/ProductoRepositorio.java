@@ -15,6 +15,7 @@ public interface ProductoRepositorio extends JpaRepository<Producto, Long>, JpaS
     // método para buscar por nombre
     Page<Producto> findByNombreContainsIgnoreCase(String txt, Pageable pageable);
 
-   // @Query("select p from Producto p LEFT JOIN FETCH p.lotes WHERE p.id = :id")
-   // public Optional<Producto> findByIdJoinFetch(Long id);
+    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.lotes WHERE p.id = :id")
+    public Optional<Producto> findByIdJoinFetch(Long id);
+
 }

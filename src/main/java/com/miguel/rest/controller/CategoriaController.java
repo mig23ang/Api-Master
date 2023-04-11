@@ -65,7 +65,7 @@ public class CategoriaController {
     // este método se debe agregar al service
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Categoria> categoryByName(@PathVariable String nombre) {
-        return categoriaRepositorio.findByNombre(nombre)
+        return categoriaRepositorio.findByNombreMySql(nombre)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
