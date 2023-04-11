@@ -2,6 +2,7 @@ package com.miguel.rest.services;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.miguel.rest.dto.CreateLoteDTO;
 import com.miguel.rest.modelo.Lote;
@@ -21,6 +22,7 @@ public class LoteService extends BaseService<Lote, Long, LoteRepositorio> {
         return repositorio.findByIdJoinFetch(id);
     }
 
+    @PostMapping("/")
     public Lote nuevoLote(CreateLoteDTO nuevoLote) {
         Lote l = Lote.builder()
                 .nombre(nuevoLote.getNombre())
